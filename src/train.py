@@ -28,7 +28,7 @@ def train_model(cfg: DictConfig):
         mlflow.set_tracking_uri(cfg.mlflow.tracking_uri)
         mlflow.set_experiment(cfg.mlflow.experiment_name)
 
-        with mlflow.start_run() as training_run:
+        with mlflow.start_run():
             # 1. New MLflow 3.x Dataset Tracking
             train_dataset = mlflow.data.from_pandas(df, name="iris_dataset")
             X = train_dataset.df.drop('target', axis=1)
