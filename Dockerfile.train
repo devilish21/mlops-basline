@@ -1,0 +1,27 @@
+# Use a more robust base image for training (includes more build tools)
+FROM python:3.9-slim
+
+# Set the working directory
+WORKDIR /app
+
+# Install system dependencies (git for DVC, build-essential for C-extensions)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the entire project
+COPY . .
+
+# Set environment variables for Hydra and MLflow
+ENV PYTHONPATH="/app"
+ENV HYDRA_FULL_ERROR=1
+
+# Default command: Run the training pipeline via DVC
+# This ensures that both data_prep and train stages are executed if needed
+CMD ["dvc", "repro"]

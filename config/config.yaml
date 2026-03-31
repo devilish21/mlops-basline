@@ -1,0 +1,20 @@
+# @package _global_
+model:
+  name: "RandomForestClassifier"
+  params:
+    n_estimators: 100
+    max_depth: 5
+    random_state: 42
+
+data:
+  raw_path: "data/raw/iris.csv"
+  processed_path: "data/processed/iris.csv"
+  test_size: 0.2
+
+mlflow:
+  tracking_uri: "http://mlflow_server:5000"
+  experiment_name: "Iris-Classification-Enterprise"
+
+paths:
+  model_dir: "models"
+  model_name: "model.joblib"
