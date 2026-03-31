@@ -40,6 +40,20 @@ services:
       - mlflow
       - minio
 
+  create_buckets:
+    image: minio/mc
+    container_name: minio_setup
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc alias set myminio http://minio:9000 mlops_user mlops_password) do echo '...waiting for minio...' && sleep 1; done;
+      /usr/bin/mc mb myminio/dvc-storage || true;
+      exit 0;
+      "
+    networks:
+      - default
+
 volumes:
   minio_data:
   jenkins_home:
