@@ -27,7 +27,7 @@ def train_model(cfg: DictConfig):
     mlflow.set_tracking_uri(cfg.mlflow.tracking_uri)
     mlflow.set_experiment(cfg.mlflow.experiment_name)
     
-    with mlflow.tracing.trace(name="Elite-Training-Flow"):
+    with mlflow.start_span(name="Elite-Training-Flow"):
         # Validate training config
         train_cfg = TrainingConfig(**cfg.model.params)
 
