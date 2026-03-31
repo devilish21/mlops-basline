@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.hydra/
+
+# Data & Models (Managed by DVC)
+data/
+models/
+!data/.gitkeep
+!models/.gitkeep
+
+# DVC local state
+.dvc/config.local
+.dvc/tmp/
+.dvc/cache/
+
+# MLOps tracking
+mlruns/
+outputs/
+
+# Environment
+.env
+venv/
+.venv/
+.gemini/

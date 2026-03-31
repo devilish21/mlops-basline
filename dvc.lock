@@ -1,0 +1,14 @@
+schema: '2.0'
+stages:
+  data-prep:
+    cmd: python src/data_prep.py
+    deps:
+    - path: src/data_prep.py
+      hash: md5
+      md5: dfc331033fb9d3cc32c932b0d7182b4c
+      size: 486
+    outs:
+    - path: data/raw/iris.csv
+      hash: md5
+      md5: 4d301abed5efe50eccda350cde38e0eb
+      size: 2777

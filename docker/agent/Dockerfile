@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y \
 
 # Pre-install Python dependencies
 COPY requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+RUN pip install --no-cache-dir "pathspec==0.11.2" \
+    && pip install --no-cache-dir -r /tmp/requirements.txt \
+    && pip install --no-cache-dir --upgrade dvc
 
 WORKDIR /app
