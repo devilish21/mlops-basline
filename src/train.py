@@ -61,10 +61,10 @@ def train_model(cfg: DictConfig):
                 )
                 clf.fit(X_train, y_train)
 
-                # 3. Explicit log_model with artifact_path (for UI visibility)
+                # 3. Explicit log_model with 3.x name (for entity-centric UI)
                 mlflow.sklearn.log_model(
                     sk_model=clf,
-                    artifact_path="model",
+                    name=cfg.mlflow.registered_model_name,
                     registered_model_name=cfg.mlflow.registered_model_name
                 )
 
