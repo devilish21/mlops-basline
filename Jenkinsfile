@@ -27,6 +27,18 @@ pipeline {
 
         stage('Train') {
             steps {
+                sh 'make train'
+            }
+        }
+
+        stage('Validate') {
+            steps {
+                sh 'make validate'
+            }
+        }
+
+        stage('Train') {
+            steps {
                 // This runs the complete DVC pipeline (data prep + training)
                 sh 'dvc repro'
             }

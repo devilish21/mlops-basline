@@ -24,7 +24,7 @@ validate:
 helm-lint:
 	helm lint charts/iris-api/
 
-ci: lint test validate helm-lint
+ci: lint test helm-lint
 
 clean:
 	rm -rf mlruns/ .dvc/cache/ dvc.lock .hydra/
