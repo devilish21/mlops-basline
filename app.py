@@ -14,6 +14,11 @@ api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
 app = FastAPI(title="Elite Iris MLOps API", version="1.0.0")
 
+# MLflow Tracking Configuration
+MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://172.19.0.2:5000")
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+mlflow.set_experiment("Elite-Iris-Experiment")
+
 
 @mlflow.trace(name="load_model_artifact")
 def load_cached_model(path: str):

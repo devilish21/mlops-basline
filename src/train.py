@@ -26,6 +26,10 @@ def train_model(cfg: DictConfig):
     """Enterprise-grade training with MLflow 3.x patterns."""
     logger.info("Starting Elite training pipeline", extra={"config": cfg})
 
+    # MLflow Tracking
+    mlflow.set_tracking_uri(cfg.mlflow.tracking_uri)
+    mlflow.set_experiment(cfg.mlflow.experiment_name)
+    
     # Validate training config
     train_cfg = TrainingConfig(**cfg.model.params)
 
@@ -33,14 +37,13 @@ def train_model(cfg: DictConfig):
         # Load data
         df = load_data(cfg.data.raw_path)
 
-        # MLflow Tracking
-        mlflow.set_tracking_uri(cfg.mlflow.tracking_uri)
-        mlflow.set_experiment(cfg.mlflow.experiment_name)
-
-        # Enable system metrics with high-frequency sampling (for short runs)
+        # 3.x Robust setup
+        mlflow.sklearn.autolog(log_models=True, log_datasets=True)
         mlflow.set_system_metrics_sampling_interval(1)
 
-        with mlflow.start_run(log_system_metrics=True):
+        with mlflow.start_run(log_system_metrics=True) as run:
+            logger.info(f"MLflow Run ID: {run.info.run_id}")
+            logger.info(f"Tracking URI: {mlflow.get_tracking_uri()}")
             # 1. New MLflow 3.x Dataset Tracking
             train_dataset = mlflow.data.from_pandas(df, name="iris_dataset")
             X = train_dataset.df.drop('target', axis=1)
@@ -59,17 +62,15 @@ def train_model(cfg: DictConfig):
             )
             clf.fit(X_train, y_train)
 
-            # 3. Enhanced log_model (Linking to LoggedModel entity)
-            model_info = mlflow.sklearn.log_model(
+            # 3. Explicit log_model with artifact_path (for UI visibility)
+            mlflow.sklearn.log_model(
                 sk_model=clf,
-                name=cfg.mlflow.registered_model_name,
-                params=cfg.model.params,
-                input_example=X_train.head(3),
+                artifact_path="model",
                 registered_model_name=cfg.mlflow.registered_model_name
             )
 
             # 4. Evaluation & Logging
-            logged_model = mlflow.get_logged_model(model_info.model_id)
+            logged_model_id = run.info.run_id # Simplified for 3.x autolog
             y_pred = clf.predict(X_test)
             # Calculate metrics
             metrics = {
@@ -88,28 +89,21 @@ def train_model(cfg: DictConfig):
             # Log to standard "Metrics" tab
             mlflow.log_metrics(metrics)
 
-            # Log to "Model metrics" tab (Linked to LoggedModel)
-            mlflow.log_metrics(
-                metrics=metrics,
-                model_id=logged_model.model_id,
-                dataset=train_dataset
-            )
-
-            # Save local artifact for local testing
+            # Save local artifact
             model_path = os.path.join(
                 cfg.paths.model_dir, cfg.paths.model_name
             )
             os.makedirs(cfg.paths.model_dir, exist_ok=True)
             joblib.dump(clf, model_path)
 
-            # 5. Traditional Artifact Logging (for the Artifacts tab)
-            mlflow.log_artifact(model_path)
+            # Explicitly log the folder
+            mlflow.log_artifacts(cfg.paths.model_dir, artifact_path="model_output")
 
             logger.info(
                 "Elite Training successful",
                 extra={
                     "accuracy": metrics["accuracy"],
-                    "model_id": logged_model.model_id,
+                    "model_id": logged_model_id,
                     "model_path": model_path
                 }
             )
