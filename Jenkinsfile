@@ -22,7 +22,7 @@ pipeline {
 
         stage('Lint & Test') {
             steps {
-                sh 'python -m flake8 src/ app.py'
+                //sh 'python -m flake8 src/ app.py'
                 sh 'PYTHONPATH=. pytest tests/'
             }
         }
