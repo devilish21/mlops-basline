@@ -9,6 +9,7 @@ pipeline {
     environment {
         REGISTRY = "localhost"
         IMAGE_NAME = "elite-iris-api"
+        MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING = 'true'
     }
 
     stages {

@@ -3,6 +3,7 @@ import joblib
 import pandas as pd
 import mlflow
 import mlflow.sklearn
+import mlflow.system_metrics
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import (
@@ -35,9 +36,11 @@ def train_model(cfg: DictConfig):
         # MLflow Tracking
         mlflow.set_tracking_uri(cfg.mlflow.tracking_uri)
         mlflow.set_experiment(cfg.mlflow.experiment_name)
-        mlflow.enable_system_metrics_logging()
+        
+        # Enable system metrics with high-frequency sampling (for short runs)
+        mlflow.set_system_metrics_sampling_interval(1)
 
-        with mlflow.start_run():
+        with mlflow.start_run(log_system_metrics=True):
             # 1. New MLflow 3.x Dataset Tracking
             train_dataset = mlflow.data.from_pandas(df, name="iris_dataset")
             X = train_dataset.df.drop('target', axis=1)
@@ -56,7 +59,7 @@ def train_model(cfg: DictConfig):
             )
             clf.fit(X_train, y_train)
 
-            # 3. Enhanced log_model (Linking params to the LoggedModel entity)
+            # 3. Enhanced log_model (Linking to LoggedModel entity)
             model_info = mlflow.sklearn.log_model(
                 sk_model=clf,
                 name=cfg.mlflow.registered_model_name,
@@ -98,6 +101,9 @@ def train_model(cfg: DictConfig):
             )
             os.makedirs(cfg.paths.model_dir, exist_ok=True)
             joblib.dump(clf, model_path)
+
+            # 5. Traditional Artifact Logging (for the Artifacts tab)
+            mlflow.log_artifact(model_path)
 
             logger.info(
                 "Elite Training successful",
