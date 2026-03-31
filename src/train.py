@@ -36,7 +36,7 @@ def train_model(cfg: DictConfig):
         # MLflow Tracking
         mlflow.set_tracking_uri(cfg.mlflow.tracking_uri)
         mlflow.set_experiment(cfg.mlflow.experiment_name)
-        
+
         # Enable system metrics with high-frequency sampling (for short runs)
         mlflow.set_system_metrics_sampling_interval(1)
 
