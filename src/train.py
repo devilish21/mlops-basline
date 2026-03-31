@@ -90,6 +90,28 @@ def train_model(cfg: DictConfig):
                     )
                 }
 
+                # Evidently AI Report: Data Drift & Classification Performance
+                try:
+                    from evidently.report import Report
+                    from evidently.metric_preset import DataDriftPreset, ClassificationPreset
+                    logger.info("Generating Evidently AI Report...")
+                    
+                    train_eval_df = X_train.copy()
+                    train_eval_df['target'] = y_train
+                    train_eval_df['prediction'] = clf.predict(X_train)
+                    
+                    test_eval_df = X_test.copy()
+                    test_eval_df['target'] = y_test
+                    test_eval_df['prediction'] = y_pred
+                    
+                    report = Report(metrics=[DataDriftPreset(), ClassificationPreset()])
+                    report.run(reference_data=train_eval_df, current_data=test_eval_df)
+                    report.save_html("evidently_report.html")
+                    mlflow.log_artifact("evidently_report.html", artifact_path="quality_reports")
+                    logger.info("Evidently AI Report logged to MLflow successfully.")
+                except Exception as e:
+                    logger.error(f"Failed to generate Evidently report: {e}")
+
                 # Log to standard "Metrics" tab (Autolog handles these, so we skip manual to avoid IntegrityError)
                 # mlflow.log_metrics(metrics)
 

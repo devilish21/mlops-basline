@@ -32,6 +32,7 @@ pipeline {
             steps {
                 script {
                     sh 'dvc pull data/raw/iris.csv'
+                    sh 'PYTHONPATH=. python src/validate_data.py'
                     sh 'dvc repro'
                 }
             }
