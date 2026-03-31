@@ -51,7 +51,11 @@ def train_model(cfg: DictConfig):
             mlflow.log_metric("accuracy", accuracy)
 
             # Register model
-            mlflow.sklearn.log_model(clf, "iris_model")
+            mlflow.sklearn.log_model(
+                clf,
+                "iris_model",
+                registered_model_name=cfg.mlflow.registered_model_name
+            )
 
             # Save local artifact
             model_path = os.path.join(

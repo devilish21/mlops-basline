@@ -14,6 +14,7 @@ data:
 mlflow:
   tracking_uri: "http://172.19.0.2:5000"
   experiment_name: "Iris-Classification-Enterprise"
+  registered_model_name: "Iris-Classifier-Enterprise"
 
 paths:
   model_dir: "models"
