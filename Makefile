@@ -16,7 +16,7 @@ test:
 	pytest tests/
 
 lint:
-	flake8 src/ app.py
+	python -m flake8 src/ app.py
 
 validate:
 	python src/validate_model.py
