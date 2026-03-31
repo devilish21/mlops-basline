@@ -5,7 +5,9 @@ import mlflow
 import mlflow.sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score, f1_score
+)
 import hydra
 from omegaconf import DictConfig
 from src.logger import logger
@@ -66,13 +68,18 @@ def train_model(cfg: DictConfig):
             # 4. Evaluation & Logging
             logged_model = mlflow.get_logged_model(model_info.model_id)
             y_pred = clf.predict(X_test)
-            
             # Calculate metrics
             metrics = {
                 "accuracy": accuracy_score(y_test, y_pred),
-                "precision": precision_score(y_test, y_pred, average='weighted'),
-                "recall": recall_score(y_test, y_pred, average='weighted'),
-                "f1": f1_score(y_test, y_pred, average='weighted')
+                "precision": precision_score(
+                    y_test, y_pred, average='weighted'
+                ),
+                "recall": recall_score(
+                    y_test, y_pred, average='weighted'
+                ),
+                "f1": f1_score(
+                    y_test, y_pred, average='weighted'
+                )
             }
 
             # Log to standard "Metrics" tab
@@ -95,7 +102,7 @@ def train_model(cfg: DictConfig):
             logger.info(
                 "Elite Training successful",
                 extra={
-                    "accuracy": accuracy,
+                    "accuracy": metrics["accuracy"],
                     "model_id": logged_model.model_id,
                     "model_path": model_path
                 }

@@ -14,6 +14,7 @@ api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
 app = FastAPI(title="Elite Iris MLOps API", version="1.0.0")
 
+
 @mlflow.trace(name="load_model_artifact")
 def load_cached_model(path: str):
     return joblib.load(path)

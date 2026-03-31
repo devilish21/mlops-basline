@@ -39,9 +39,6 @@ pipeline {
         }
 
         stage('Build') {
-            when {
-                branch 'main'
-            }
             steps {
                 script {
                     sh "docker build -t ${IMAGE_NAME}:latest ."
@@ -63,27 +60,7 @@ pipeline {
             }
         }
 
-        stage('Deploy Staging') {
-            when {
-                branch 'main'
-            }
-            steps {
-                sh "helm upgrade --install elite-iris-api-staging ./charts/elite-iris-api --namespace staging --values ./charts/elite-iris-api/values-staging.yaml"
-            }
-        }
 
-        stage('Deploy Production') {
-            when {
-                branch 'main'
-            }
-            input {
-                message "Deploy to Production?"
-                ok "Deploy"
-            }
-            steps {
-                sh "helm upgrade --install elite-iris-api-prod ./charts/elite-iris-api --namespace production --values ./charts/elite-iris-api/values-production.yaml"
-            }
-        }
     }
 
     post {
