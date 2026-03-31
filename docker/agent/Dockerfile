@@ -10,8 +10,10 @@ RUN apt-get update && apt-get install -y \
 
 # Pre-install Python dependencies
 COPY requirements.txt /tmp/requirements.txt
+# First install base requirements (without DVC which is moved to separate step)
 RUN pip install --no-cache-dir "pathspec==0.11.2" \
-    && pip install --no-cache-dir -r /tmp/requirements.txt \
-    && pip install --no-cache-dir --upgrade dvc
+    && pip install --no-cache-dir -r /tmp/requirements.txt
+# Then force install DVC with S3 support using pinned versions to avoid resolution hell
+RUN pip install --no-cache-dir "dvc-s3==3.1.0" "boto3==1.34.69" "botocore==1.34.69"
 
 WORKDIR /app
