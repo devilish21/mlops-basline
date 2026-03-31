@@ -12,6 +12,11 @@ pipeline {
         MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING = 'true'
     }
 
+    environment {
+        MLFLOW_TRACKING_URI = 'http://mlflow:5000'
+        API_KEY = 'enterprise-secret-key'
+    }
+
     stages {
         stage('Initialize') {
             steps {
@@ -21,9 +26,6 @@ pipeline {
         }
 
         stage('Lint & Test') {
-            environment {
-                MLFLOW_TRACKING_URI = 'http://mlflow:5000'
-            }
             steps {
                 sh 'PYTHONPATH=. pytest tests/'
             }
