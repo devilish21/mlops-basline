@@ -12,7 +12,7 @@ data:
   test_size: 0.2
 
 mlflow:
-  tracking_uri: "http://mlflow_server:5000"
+  tracking_uri: "http://172.19.0.2:5000"
   experiment_name: "Iris-Classification-Enterprise"
 
 paths:
