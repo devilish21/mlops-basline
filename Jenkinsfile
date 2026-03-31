@@ -14,6 +14,7 @@ pipeline {
     stages {
         stage('Install') {
             steps {
+                sh 'apt-get update && apt-get install -y make git'
                 sh 'pip install -r requirements.txt'
             }
         }
