@@ -10,10 +10,7 @@ pipeline {
         REGISTRY = "localhost"
         IMAGE_NAME = "elite-iris-api"
         MLFLOW_ENABLE_SYSTEM_METRICS_LOGGING = 'true'
-    }
-
-    environment {
-        MLFLOW_TRACKING_URI = 'http://mlflow:5000'
+        MLFLOW_TRACKING_URI = 'http://mlflow_server:5000'
         API_KEY = 'enterprise-secret-key'
     }
 
