@@ -29,6 +29,7 @@ pipeline {
 
         stage('Train') {
             steps {
+                sh 'dvc pull'
                 sh 'dvc repro'
             }
         }
