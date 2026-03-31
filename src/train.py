@@ -85,7 +85,7 @@ def train_model(cfg: DictConfig):
             # Log to standard "Metrics" tab
             mlflow.log_metrics(metrics)
 
-            # Log specifically to the "Model metrics" tab (Linked to LoggedModel)
+            # Log to "Model metrics" tab (Linked to LoggedModel)
             mlflow.log_metrics(
                 metrics=metrics,
                 model_id=logged_model.model_id,
