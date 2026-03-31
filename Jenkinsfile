@@ -21,6 +21,9 @@ pipeline {
         }
 
         stage('Lint & Test') {
+            environment {
+                MLFLOW_TRACKING_URI = 'http://mlflow:5000'
+            }
             steps {
                 sh 'PYTHONPATH=. pytest tests/'
             }
