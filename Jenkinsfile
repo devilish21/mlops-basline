@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'mlops-agent:latest'
-            args '-u root'
+            args '-u root --network mlops_default'
         }
     }
 
