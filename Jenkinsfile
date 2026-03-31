@@ -31,8 +31,10 @@ pipeline {
 
         stage('Train') {
             steps {
-                sh 'dvc pull'
-                sh 'dvc repro'
+                script {
+                    sh 'dvc pull data/raw/iris.csv'
+                    sh 'dvc repro'
+                }
             }
         }
 
