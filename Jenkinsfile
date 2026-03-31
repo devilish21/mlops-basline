@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'python:3.9-slim'
+            image 'mlops-agent:latest'
             args '-u root'
         }
     }
@@ -12,10 +12,10 @@ pipeline {
     }
 
     stages {
-        stage('Install') {
+        stage('Initialize') {
             steps {
-                sh 'apt-get update && apt-get install -y make git'
-                sh 'pip install -r requirements.txt'
+                sh 'python --version'
+                sh 'make --version'
             }
         }
 
