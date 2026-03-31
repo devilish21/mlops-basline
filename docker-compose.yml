@@ -12,7 +12,7 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: minio_s3
+    container_name: minio-s3
     ports:
       - "9000:9000"
       - "9001:9001"
