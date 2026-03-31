@@ -21,20 +21,20 @@ pipeline {
 
         stage('Lint & Test') {
             steps {
-                sh 'make ci'
+                sh 'python -m flake8 src/ app.py'
+                sh 'PYTHONPATH=. pytest tests/'
             }
         }
 
         stage('Train') {
             steps {
-                // This runs the complete DVC pipeline via Makefile
-                sh 'make train'
+                sh 'dvc repro'
             }
         }
 
         stage('Validate') {
             steps {
-                sh 'make validate'
+                sh 'PYTHONPATH=. python src/validate_model.py'
             }
         }
 
