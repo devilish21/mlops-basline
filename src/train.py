@@ -50,7 +50,6 @@ def train_model(cfg: DictConfig):
             # 3. Enhanced log_model (Linking params to the LoggedModel entity)
             model_info = mlflow.sklearn.log_model(
                 sk_model=clf,
-                artifact_path="iris_model",
                 name=cfg.mlflow.registered_model_name,
                 params=cfg.model.params,
                 input_example=X_train.head(3),

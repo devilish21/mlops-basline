@@ -97,10 +97,10 @@ Deploying with Helm:
 
 ```bash
 # Staging Deployment
-helm upgrade --install iris-api-staging ./charts/iris-api --namespace staging -f ./charts/iris-api/values-staging.yaml
+helm upgrade --install elite-iris-api-staging ./charts/elite-iris-api --namespace staging -f ./charts/elite-iris-api/values-staging.yaml
 
 # Production Deployment
-helm upgrade --install iris-api-prod ./charts/iris-api --namespace production -f ./charts/iris-api/values-production.yaml
+helm upgrade --install elite-iris-api-prod ./charts/elite-iris-api --namespace production -f ./charts/elite-iris-api/values-production.yaml
 ```
 
 ### Monitoring & Secrets
