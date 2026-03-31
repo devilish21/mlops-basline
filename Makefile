@@ -13,7 +13,7 @@ down:
 	docker-compose down
 
 test:
-	pytest tests/
+	PYTHONPATH=. pytest tests/
 
 lint:
 	python -m flake8 src/ app.py
