@@ -17,6 +17,7 @@ class IrisFeatures(BaseModel):
 
 
 class PredictionResponse(BaseModel):
+    model_config = {'protected_namespaces': ()}
     prediction: int
     model_version: str
     status: str = "success"

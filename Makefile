@@ -19,7 +19,7 @@ lint:
 	python -m flake8 src/ app.py
 
 validate:
-	python src/validate_model.py
+	PYTHONPATH=. python src/validate_model.py
 
 helm-lint:
 	helm lint charts/iris-api/
