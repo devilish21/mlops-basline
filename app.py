@@ -17,7 +17,10 @@ app = FastAPI(title="Elite Iris MLOps API", version="1.0.0")
 # MLflow Tracking Configuration
 MLFLOW_TRACKING_URI = os.getenv("MLFLOW_TRACKING_URI", "http://172.19.0.2:5000")
 mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-mlflow.set_experiment("Elite-Iris-Experiment")
+try:
+    mlflow.set_experiment("Elite-Iris-Experiment")
+except Exception as e:
+    logger.warning(f"MLflow experiment initialization skipped: {str(e)}")
 
 
 @mlflow.trace(name="load_model_artifact")

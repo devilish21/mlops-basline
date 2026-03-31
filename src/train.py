@@ -25,7 +25,12 @@ def load_data(path: str):
 def train_model(cfg: DictConfig):
     # MLflow Tracking
     mlflow.set_tracking_uri(cfg.mlflow.tracking_uri)
-    mlflow.set_experiment(cfg.mlflow.experiment_name)
+    try:
+        mlflow.set_experiment(cfg.mlflow.experiment_name)
+    except Exception as e:
+        logger.warning(f"New experiment initialization needed: {str(e)}")
+        # Optionally try to fallback to a timestamped experiment name
+        mlflow.set_experiment(f"{cfg.mlflow.experiment_name}-fallback")
     
     with mlflow.start_span(name="Elite-Training-Flow"):
         # Validate training config
