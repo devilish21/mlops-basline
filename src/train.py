@@ -14,8 +14,8 @@ from src.schemas import TrainingConfig
 
 @hydra.main(config_path="../config", config_name="config", version_base="1.2")
 def train_model(cfg: DictConfig):
-    """Enterprise-grade training with Hydra and MLflow."""
-    logger.info("Starting training pipeline", extra={"config": cfg})
+    """Enterprise-grade training with MLflow 3.x patterns."""
+    logger.info("Starting Elite training pipeline", extra={"config": cfg})
 
     # Validate training config
     train_cfg = TrainingConfig(**cfg.model.params)
@@ -23,19 +23,23 @@ def train_model(cfg: DictConfig):
     try:
         # Load data
         df = pd.read_csv(cfg.data.raw_path)
-        X = df.drop('target', axis=1)
-        y = df['target']
-
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=cfg.data.test_size,
-            random_state=cfg.model.params.random_state
-        )
 
         # MLflow Tracking
         mlflow.set_tracking_uri(cfg.mlflow.tracking_uri)
         mlflow.set_experiment(cfg.mlflow.experiment_name)
 
-        with mlflow.start_run():
+        with mlflow.start_run() as training_run:
+            # 1. New MLflow 3.x Dataset Tracking
+            train_dataset = mlflow.data.from_pandas(df, name="iris_dataset")
+            X = train_dataset.df.drop('target', axis=1)
+            y = train_dataset.df['target']
+
+            X_train, X_test, y_train, y_test = train_test_split(
+                X, y, test_size=cfg.data.test_size,
+                random_state=cfg.model.params.random_state
+            )
+
+            # 2. Train Model
             clf = RandomForestClassifier(
                 n_estimators=train_cfg.n_estimators,
                 max_depth=train_cfg.max_depth,
@@ -43,21 +47,28 @@ def train_model(cfg: DictConfig):
             )
             clf.fit(X_train, y_train)
 
-            y_pred = clf.predict(X_test)
-            accuracy = accuracy_score(y_test, y_pred)
-
-            # Log params and metrics
-            mlflow.log_params(cfg.model.params)
-            mlflow.log_metric("accuracy", accuracy)
-
-            # Register model
-            mlflow.sklearn.log_model(
-                clf,
-                "iris_model",
+            # 3. Enhanced log_model (Linking params to the LoggedModel entity)
+            model_info = mlflow.sklearn.log_model(
+                sk_model=clf,
+                artifact_path="iris_model",
+                name=cfg.mlflow.registered_model_name,
+                params=cfg.model.params,
+                input_example=X_train.head(3),
                 registered_model_name=cfg.mlflow.registered_model_name
             )
 
-            # Save local artifact
+            # 4. Link Metrics to LoggedModel
+            logged_model = mlflow.get_logged_model(model_info.model_id)
+            y_pred = clf.predict(X_test)
+            accuracy = accuracy_score(y_test, y_pred)
+
+            mlflow.log_metrics(
+                metrics={"accuracy": accuracy},
+                model_id=logged_model.model_id,
+                dataset=train_dataset
+            )
+
+            # Save local artifact for local testing
             model_path = os.path.join(
                 cfg.paths.model_dir, cfg.paths.model_name
             )
@@ -65,8 +76,12 @@ def train_model(cfg: DictConfig):
             joblib.dump(clf, model_path)
 
             logger.info(
-                "Training successful",
-                extra={"accuracy": accuracy, "model_path": model_path}
+                "Elite Training successful",
+                extra={
+                    "accuracy": accuracy,
+                    "model_id": logged_model.model_id,
+                    "model_path": model_path
+                }
             )
 
     except Exception as e:

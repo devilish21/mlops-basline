@@ -11,7 +11,7 @@ API_KEY = os.getenv("API_KEY", "enterprise-secret-key")
 API_KEY_NAME = "X-API-Key"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
-app = FastAPI(title="Enterprise Iris MLOps API", version="1.0.0")
+app = FastAPI(title="Elite Iris MLOps API", version="1.0.0")
 
 # Model Loading
 

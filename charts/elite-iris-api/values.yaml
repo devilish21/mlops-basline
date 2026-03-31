@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: iris-api
+  repository: elite-iris-api
   pullPolicy: IfNotPresent
   tag: "latest"
 

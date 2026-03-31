@@ -13,8 +13,8 @@ data:
 
 mlflow:
   tracking_uri: "http://172.19.0.2:5000"
-  experiment_name: "Iris-Classification-Enterprise"
-  registered_model_name: "Iris-Classifier-Enterprise"
+  experiment_name: "Elite-Iris-Experiment"
+  registered_model_name: "Elite-Iris-Model"
 
 paths:
   model_dir: "models"

@@ -8,7 +8,7 @@ pipeline {
 
     environment {
         REGISTRY = "localhost"
-        IMAGE_NAME = "iris-api"
+        IMAGE_NAME = "elite-iris-api"
     }
 
     stages {
@@ -68,7 +68,7 @@ pipeline {
                 branch 'main'
             }
             steps {
-                sh "helm upgrade --install iris-api-staging ./charts/iris-api --namespace staging --values ./charts/iris-api/values-staging.yaml"
+                sh "helm upgrade --install elite-iris-api-staging ./charts/elite-iris-api --namespace staging --values ./charts/elite-iris-api/values-staging.yaml"
             }
         }
 
@@ -81,7 +81,7 @@ pipeline {
                 ok "Deploy"
             }
             steps {
-                sh "helm upgrade --install iris-api-prod ./charts/iris-api --namespace production --values ./charts/iris-api/values-production.yaml"
+                sh "helm upgrade --install elite-iris-api-prod ./charts/elite-iris-api --namespace production --values ./charts/elite-iris-api/values-production.yaml"
             }
         }
     }
