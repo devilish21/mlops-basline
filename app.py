@@ -3,6 +3,7 @@ from fastapi.security import APIKeyHeader
 import joblib
 import numpy as np
 import os
+import mlflow
 from src.schemas import IrisFeatures, PredictionResponse
 from src.logger import logger
 
@@ -12,6 +13,11 @@ API_KEY_NAME = "X-API-Key"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
 app = FastAPI(title="Elite Iris MLOps API", version="1.0.0")
+
+@mlflow.trace(name="load_model_artifact")
+def load_cached_model(path: str):
+    return joblib.load(path)
+
 
 # Model Loading
 
@@ -31,6 +37,7 @@ def health():
     return {"status": "healthy", "model_loaded": os.path.exists(MODEL_PATH)}
 
 
+@mlflow.trace(name="inference_request")
 @app.post("/predict", response_model=PredictionResponse)
 def predict(features: IrisFeatures, api_key: str = Depends(get_api_key)):
     if not os.path.exists(MODEL_PATH):
@@ -38,7 +45,7 @@ def predict(features: IrisFeatures, api_key: str = Depends(get_api_key)):
         raise HTTPException(status_code=500, detail="Model artifact missing")
 
     try:
-        model = joblib.load(MODEL_PATH)
+        model = load_cached_model(MODEL_PATH)
         data = np.array([[
             features.sepal_length,
             features.sepal_width,

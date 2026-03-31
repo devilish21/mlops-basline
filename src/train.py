@@ -5,13 +5,19 @@ import mlflow
 import mlflow.sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 import hydra
 from omegaconf import DictConfig
 from src.logger import logger
 from src.schemas import TrainingConfig
 
 
+@mlflow.trace(name="data_loading")
+def load_data(path: str):
+    return pd.read_csv(path)
+
+
+@mlflow.trace
 @hydra.main(config_path="../config", config_name="config", version_base="1.2")
 def train_model(cfg: DictConfig):
     """Enterprise-grade training with MLflow 3.x patterns."""
@@ -22,11 +28,12 @@ def train_model(cfg: DictConfig):
 
     try:
         # Load data
-        df = pd.read_csv(cfg.data.raw_path)
+        df = load_data(cfg.data.raw_path)
 
         # MLflow Tracking
         mlflow.set_tracking_uri(cfg.mlflow.tracking_uri)
         mlflow.set_experiment(cfg.mlflow.experiment_name)
+        mlflow.enable_system_metrics_logging()
 
         with mlflow.start_run():
             # 1. New MLflow 3.x Dataset Tracking
@@ -56,13 +63,24 @@ def train_model(cfg: DictConfig):
                 registered_model_name=cfg.mlflow.registered_model_name
             )
 
-            # 4. Link Metrics to LoggedModel
+            # 4. Evaluation & Logging
             logged_model = mlflow.get_logged_model(model_info.model_id)
             y_pred = clf.predict(X_test)
-            accuracy = accuracy_score(y_test, y_pred)
+            
+            # Calculate metrics
+            metrics = {
+                "accuracy": accuracy_score(y_test, y_pred),
+                "precision": precision_score(y_test, y_pred, average='weighted'),
+                "recall": recall_score(y_test, y_pred, average='weighted'),
+                "f1": f1_score(y_test, y_pred, average='weighted')
+            }
 
+            # Log to standard "Metrics" tab
+            mlflow.log_metrics(metrics)
+
+            # Log specifically to the "Model metrics" tab (Linked to LoggedModel)
             mlflow.log_metrics(
-                metrics={"accuracy": accuracy},
+                metrics=metrics,
                 model_id=logged_model.model_id,
                 dataset=train_dataset
             )
