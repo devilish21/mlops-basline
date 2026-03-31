@@ -11,6 +11,7 @@ from omegaconf import DictConfig
 from src.logger import logger
 from src.schemas import TrainingConfig
 
+
 @hydra.main(config_path="../config", config_name="config", version_base="1.2")
 def train_model(cfg: DictConfig):
     """Enterprise-grade training with Hydra and MLflow."""
@@ -53,7 +54,9 @@ def train_model(cfg: DictConfig):
             mlflow.sklearn.log_model(clf, "iris_model")
 
             # Save local artifact
-            model_path = os.path.join(cfg.paths.model_dir, cfg.paths.model_name)
+            model_path = os.path.join(
+                cfg.paths.model_dir, cfg.paths.model_name
+            )
             os.makedirs(cfg.paths.model_dir, exist_ok=True)
             joblib.dump(clf, model_path)
 

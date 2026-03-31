@@ -14,7 +14,9 @@ api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 app = FastAPI(title="Enterprise Iris MLOps API", version="1.0.0")
 
 # Model Loading
+
 MODEL_PATH = 'models/model.joblib'
+
 
 async def get_api_key(api_key: str = Security(api_key_header)):
     if api_key == API_KEY:
@@ -34,7 +36,7 @@ def predict(features: IrisFeatures, api_key: str = Depends(get_api_key)):
     if not os.path.exists(MODEL_PATH):
         logger.error("Model prediction failed: Model not found")
         raise HTTPException(status_code=500, detail="Model artifact missing")
-    
+
     try:
         model = joblib.load(MODEL_PATH)
         data = np.array([[
