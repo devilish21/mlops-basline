@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, Security, Header
+from fastapi import FastAPI, Depends, HTTPException, Security
 from fastapi.security import APIKeyHeader
 import joblib
 import numpy as np
@@ -19,11 +19,15 @@ MODEL_PATH = 'models/model.joblib'
 async def get_api_key(api_key: str = Security(api_key_header)):
     if api_key == API_KEY:
         return api_key
-    raise HTTPException(status_code=403, detail="Could not validate credentials")
+    raise HTTPException(
+        status_code=403, detail="Could not validate credentials"
+    )
+
 
 @app.get("/health")
 def health():
     return {"status": "healthy", "model_loaded": os.path.exists(MODEL_PATH)}
+
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict(features: IrisFeatures, api_key: str = Depends(get_api_key)):
@@ -34,15 +38,17 @@ def predict(features: IrisFeatures, api_key: str = Depends(get_api_key)):
     try:
         model = joblib.load(MODEL_PATH)
         data = np.array([[
-            features.sepal_length, 
-            features.sepal_width, 
-            features.petal_length, 
+            features.sepal_length,
+            features.sepal_width,
+            features.petal_length,
             features.petal_width
         ]])
         prediction = model.predict(data)
-        
-        logger.info("Prediction successful", extra={"prediction": int(prediction[0])})
-        
+
+        logger.info(
+            "Prediction successful", extra={"prediction": int(prediction[0])}
+        )
+
         return PredictionResponse(
             prediction=int(prediction[0]),
             model_version="v1.0.0"
@@ -50,6 +56,7 @@ def predict(features: IrisFeatures, api_key: str = Depends(get_api_key)):
     except Exception as e:
         logger.error("Prediction failed", extra={"error": str(e)})
         raise HTTPException(status_code=500, detail="Internal inference error")
+
 
 if __name__ == "__main__":
     import uvicorn
