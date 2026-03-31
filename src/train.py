@@ -20,26 +20,24 @@ def load_data(path: str):
     return pd.read_csv(path)
 
 
-@mlflow.trace
+
 @hydra.main(config_path="../config", config_name="config", version_base="1.2")
 def train_model(cfg: DictConfig):
-    """Enterprise-grade training with MLflow 3.x patterns."""
-    logger.info("Starting Elite training pipeline", extra={"config": cfg})
-
     # MLflow Tracking
     mlflow.set_tracking_uri(cfg.mlflow.tracking_uri)
     mlflow.set_experiment(cfg.mlflow.experiment_name)
     
-    # Validate training config
-    train_cfg = TrainingConfig(**cfg.model.params)
+    with mlflow.tracing.trace(name="Elite-Training-Flow"):
+        # Validate training config
+        train_cfg = TrainingConfig(**cfg.model.params)
 
-    try:
-        # Load data
-        df = load_data(cfg.data.raw_path)
+        try:
+            # Load data
+            df = load_data(cfg.data.raw_path)
 
-        # 3.x Robust setup
-        mlflow.sklearn.autolog(log_models=True, log_datasets=True)
-        mlflow.set_system_metrics_sampling_interval(1)
+            # 3.x Robust setup
+            mlflow.sklearn.autolog(log_models=True, log_datasets=True)
+            mlflow.set_system_metrics_sampling_interval(1)
 
         with mlflow.start_run(log_system_metrics=True) as run:
             logger.info(f"MLflow Run ID: {run.info.run_id}")
@@ -86,8 +84,8 @@ def train_model(cfg: DictConfig):
                 )
             }
 
-            # Log to standard "Metrics" tab
-            mlflow.log_metrics(metrics)
+            # Log to standard "Metrics" tab (Autolog handles these, so we skip manual to avoid IntegrityError)
+            # mlflow.log_metrics(metrics)
 
             # Save local artifact
             model_path = os.path.join(
