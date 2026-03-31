@@ -6,10 +6,9 @@ __pycache__/
 .hydra/
 
 # Data & Models (Managed by DVC)
-data/
-models/
-!data/.gitkeep
-!models/.gitkeep
+# We ignore the actual files, but keep the .dvc pointers
+data/raw/iris.csv
+models/model.joblib
 
 # DVC local state
 .dvc/config.local
@@ -25,3 +24,4 @@ outputs/
 venv/
 .venv/
 .gemini/
+/dvc_host
