@@ -1,13 +1,13 @@
 stages:
   data-prep:
-    cmd: python src/data_prep.py
+    cmd: PYTHONPATH=. python src/data_prep.py
     deps:
       - src/data_prep.py
     outs:
       - data/raw/iris.csv
 
   train:
-    cmd: python src/train.py
+    cmd: PYTHONPATH=. python src/train.py
     deps:
       - data/raw/iris.csv
       - src/train.py
