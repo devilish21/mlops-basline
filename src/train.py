@@ -41,11 +41,7 @@ def train_model(cfg: DictConfig):
             df = load_data(cfg.data.raw_path)
 
             # 3.x Robust setup
-            mlflow.sklearn.autolog(
-                log_models=True,
-                log_datasets=True,
-                registered_model_name=cfg.mlflow.registered_model_name
-            )
+            mlflow.sklearn.autolog(log_models=True, log_datasets=True)
             mlflow.set_system_metrics_sampling_interval(1)
 
             with mlflow.start_run(log_system_metrics=True) as run:
@@ -70,8 +66,12 @@ def train_model(cfg: DictConfig):
                 )
                 clf.fit(X_train, y_train)
 
-                # 3. Manual Logging removed: Autolog now handles this to avoid duplicates
-                # The model is automatically logged and registered as cfg.mlflow.registered_model_name
+                # 3. Explicit log_model with 3.x name (for entity-centric UI)
+                mlflow.sklearn.log_model(
+                    sk_model=clf,
+                    name=cfg.mlflow.registered_model_name,
+                    registered_model_name=cfg.mlflow.registered_model_name
+                )
 
                 # 4. Evaluation & Logging
                 logged_model_id = run.info.run_id # Simplified for 3.x autolog
