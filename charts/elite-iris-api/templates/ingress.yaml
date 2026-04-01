@@ -2,11 +2,13 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ include "elite-iris-api.fullname" . }}
+  labels:
+    {{- include "elite-iris-api.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
   annotations:
-    {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
-    {{- end }}
+  {{- end }}
 spec:
   ingressClassName: {{ .Values.ingress.className }}
   rules:
@@ -19,9 +21,9 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: {{ $.Release.Name }}
+                name: {{ include "elite-iris-api.fullname" . }}
                 port:
-                  number: 80
+                  number: {{ $.Values.service.port }}
           {{- end }}
     {{- end }}
 {{- end }}

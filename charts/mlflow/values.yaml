@@ -1,0 +1,39 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/mlflow/mlflow
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 5000
+
+externalDatabase:
+  type: postgresql  # or mysql
+  host: "mlflow-db-host"
+  port: 5432
+  user: "mlflow_user"
+  password: "mlflow_password"
+  database: "mlflow_db"
+  # Optional: Connection string override
+  # connectionString: "postgresql://user:pass@host:port/db"
+
+persistence:
+  enabled: true
+  storageClass: "openshift-storage.ceph.com/cephfs"
+  accessMode: ReadWriteMany
+  size: 5Gi
+  mountPath: /app/mlruns
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 1Gi
+  requests:
+    cpu: 100m
+    memory: 512Mi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

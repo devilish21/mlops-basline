@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "minio.fullname" . }}-setup
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+  labels:
+    {{- include "minio.labels" . | nindent 4 }}
+spec:
+  template:
+    spec:
+      containers:
+        - name: mc
+          image: minio/mc
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              until (/usr/bin/mc alias set myminio http://{{ include "minio.fullname" . }}:{{ .Values.service.port }} {{ .Values.auth.rootUser }} {{ .Values.auth.rootPassword }}) do echo '...waiting for minio...' && sleep 1; done;
+              /usr/bin/mc mb myminio/dvc-storage || true;
+          env:
+            - name: MINIO_ROOT_USER
+              value: {{ .Values.auth.rootUser | quote }}
+            - name: MINIO_ROOT_PASSWORD
+              value: {{ .Values.auth.rootPassword | quote }}
+      restartPolicy: OnFailure

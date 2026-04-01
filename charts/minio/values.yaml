@@ -1,0 +1,40 @@
+replicaCount: 4
+
+image:
+  repository: minio/minio
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+service:
+  type: ClusterIP
+  port: 9000
+  consolePort: 9001
+
+auth:
+  rootUser: "mlops_user"
+  rootPassword: "mlops_password"
+
+persistence:
+  enabled: true
+  storageClass: "openshift-storage.ceph.com/cephfs"
+  accessMode: ReadWriteOnce # Standard for each pod in a StatefulSet
+  size: 10Gi
+  mountPath: /data
+
+# Distributed mode configuration
+# MinIO expects a specific host naming pattern for distributed mode.
+# Usually: http://minio-{0...3}.minio.default.svc.cluster.local/data
+distributed:
+  nodes: 4
+
+resources:
+  limits:
+    cpu: 1000m
+    memory: 2Gi
+  requests:
+    cpu: 250m
+    memory: 1Gi
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

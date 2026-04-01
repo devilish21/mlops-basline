@@ -24,6 +24,17 @@ spec:
             secretKeyRef:
               name: iris-secrets
               key: api-key
+        - name: MLFLOW_TRACKING_URI
+          value: {{ .Values.config.mlflowTrackingUri | quote }}
+        - name: MINIO_ENDPOINT
+          value: {{ .Values.config.minioEndpoint | quote }}
+        - name: MINIO_USER
+          value: {{ .Values.config.minioUser | quote }}
+        - name: MINIO_PASSWORD
+          value: {{ .Values.config.minioPassword | quote }}
+        volumeMounts:
+        - name: models
+          mountPath: {{ .Values.persistence.mountPath }}
         livenessProbe:
           httpGet:
             path: /health
@@ -38,3 +49,7 @@ spec:
           periodSeconds: 5
         resources:
           {{- toYaml .Values.resources | nindent 10 }}
+      volumes:
+      - name: models
+        persistentVolumeClaim:
+          claimName: {{ include "elite-iris-api.fullname" . }}-models

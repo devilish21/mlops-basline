@@ -1,0 +1,35 @@
+# Headless service for StatefulSet DNS
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "minio.fullname" . }}-headless
+  labels:
+    {{- include "minio.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  ports:
+    - port: {{ .Values.service.port }}
+      name: api
+    - port: {{ .Values.service.consolePort }}
+      name: console
+  selector:
+    {{- include "minio.selectorLabels" . | nindent 4 }}
+---
+# Public service for API/Console access
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "minio.fullname" . }}
+  labels:
+    {{- include "minio.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: api
+      name: api
+    - port: {{ .Values.service.consolePort }}
+      targetPort: console
+      name: console
+  selector:
+    {{- include "minio.selectorLabels" . | nindent 4 }}

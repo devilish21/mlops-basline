@@ -33,3 +33,15 @@ ingress:
       paths:
         - path: /
           pathType: ImplementationSpecific
+persistence:
+  enabled: true
+  storageClass: "openshift-storage.ceph.com/cephfs"
+  accessMode: ReadWriteMany
+  size: 1Gi
+  mountPath: /app/models
+
+config:
+  mlflowTrackingUri: "http://mlflow:5000"
+  minioEndpoint: "http://minio-ha:9000"
+  minioUser: "mlops_user"
+  minioPassword: "mlops_password"
